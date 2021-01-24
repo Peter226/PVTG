@@ -7,7 +7,7 @@ namespace PVTG
     public class WorkObject
     {
         private Mesh _mesh;
-        private List<Material> _materials;
+        private List<Material> _materials = new List<Material>();
         private GameObject _previewObject;
         private List<Mesh> _subMeshes = new List<Mesh>();
 
