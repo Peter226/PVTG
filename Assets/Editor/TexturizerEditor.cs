@@ -13,8 +13,6 @@ namespace PVTG.Editor {
         bool myBool = true;
         float myFloat = 1.23f;*/
 
-        private List<MeshFilter> _currentMeshes = new List<MeshFilter>();
-        private List<MeshRenderer> _currentRenderers = new List<MeshRenderer>();
         private List<WorkObject> _workObjects = new List<WorkObject>();
         private Camera _previewCamera;
         private Vector3 _cameraPivot;
@@ -94,14 +92,12 @@ namespace PVTG.Editor {
             {
                 if (Selection.activeGameObject != null) {
                     GameObject obj = Selection.activeGameObject;
-                    _currentRenderers.Clear();
-                    _currentMeshes.Clear();
-                    GetRenderersCascade(obj.transform, _currentRenderers, _currentMeshes);
-
-                    for (int f = 0;f < _currentMeshes.Count;f++)
+                    foreach (WorkObject workObject in _workObjects)
                     {
-                        _workObjects.Add(new WorkObject(_currentMeshes[f].sharedMesh,_currentRenderers[f]));
+                        workObject.Destroy();
                     }
+                    _workObjects.Clear();
+                    GetRenderersCascade(obj.transform, _workObjects);
                 }
             }
 
@@ -114,22 +110,14 @@ namespace PVTG.Editor {
             GUI.Label(new Rect(minScale * 0.4f, 0, Screen.width - minScale * 0.4f, minScale * 0.05f), "", EditorStyles.toolbarButton);
 
 
-                for (int i = 0; i < _currentMeshes.Count; i++)
-            {
-                if (_currentRenderers[i] == null)
-                {
-                    _currentRenderers.Clear();
-                    _currentMeshes.Clear();
-                    break;
-                }
-                List<Material> materials = new List<Material>();
 
-                _currentRenderers[i].GetSharedMaterials(materials);
-                for (int m = 0; m < materials.Count; m++)
-                {
-                    Graphics.DrawMesh(_currentMeshes[i].sharedMesh, _currentMeshes[i].transform.position, _currentMeshes[i].transform.rotation, materials[m], 31, _previewCamera);
-                }
+
+            for (int i = 0;i < _workObjects.Count;i++)
+            {
+                WorkObject workObject = _workObjects[i];
+                workObject.Render(_previewCamera,31);
             }
+
             _previewCamera.Render();
             if (needsRepaint) {
                 this.Repaint();
@@ -184,19 +172,18 @@ namespace PVTG.Editor {
 
 
 
-        void GetRenderersCascade(Transform transform, List<MeshRenderer> renderers, List<MeshFilter> filters)
+        void GetRenderersCascade(Transform transform, List<WorkObject> workObjects)
         {
-
+           
             Component component;
             if (transform.TryGetComponent(typeof(MeshRenderer), out component)) {
 
-                renderers.Add((MeshRenderer)component);
-                filters.Add(transform.GetComponent<MeshFilter>());
+                workObjects.Add(new WorkObject(transform.GetComponent<MeshFilter>().sharedMesh, (MeshRenderer)component));
             }
             for (int i = 0; i < transform.childCount; i++)
             {
                 Transform child = transform.GetChild(i);
-                GetRenderersCascade(child, renderers, filters);
+                GetRenderersCascade(child, workObjects);
             }
         }
     }
