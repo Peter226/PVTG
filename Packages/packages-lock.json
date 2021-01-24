@@ -1,5 +1,13 @@
 {
   "dependencies": {
+    "com.jimmycushnie.noisynodes": {
+      "version": "file:D:/Unity Projects/Noises/Noisy-Nodes-master",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.unity.shadergraph": "7.1.8"
+      }
+    },
     "com.unity.collab-proxy": {
       "version": "1.3.9",
       "depth": 0,

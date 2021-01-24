@@ -1,0 +1,26 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+Texture2D<float4> Input;
+RWTexture2D<float4> Result;
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    // TODO: insert actual code here!
+
+    //Result[id.xy] = min(float4(id.x & id.y, (id.x & 15)/15.0, (id.y & 15)/15.0, 0.0),1);
+	float4 c00 = Input[id.xy - int2(1, 1)];
+	float4 c10 = Input[id.xy - int2(0, 1)];
+	float4 c01 = Input[id.xy - int2(1, 0)];
+	float4 c11 = Input[id.xy];
+	float4 c20 = Input[id.xy + int2(1, -1)];
+	float4 c02 = Input[id.xy + int2(-1, 1)];
+	float4 c22 = Input[id.xy + int2(1, 1)];
+	float4 c21 = Input[id.xy + int2(1, 0)];
+	float4 c12 = Input[id.xy + int2(0, 1)];
+	float sum = c00.a + c01.a + c10.a + c11.a + c12.a + c21.a + c20.a + c02.a + c22.a;
+	Result[id.xy] = c11 * c11.a + (1.0f - c11.a) * ((c00 * c00.a + c01 * c01.a + c10 * c10.a + c11 * c11.a + c02 * c02.a + c20 * c20.a + c22 * c22.a + c21 * c21.a + c12 * c12.a) / max(0.1,sum));
+}
