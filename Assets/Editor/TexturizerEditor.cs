@@ -2,6 +2,9 @@ using UnityEditor;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
+using UnityEditor.Experimental.GraphView;
+using UnityEngine.UIElements;
+
 namespace PVTG.Editor {
     public class TexturizerEditor : EditorWindow
     {
@@ -21,6 +24,8 @@ namespace PVTG.Editor {
 
         private Vector2 _lastMouse;
         private Vector2 _mouseDelta;
+        private TexturizerGraphView _graphView;
+
 
         // Add menu item named "My Window" to the Window menu
         [MenuItem("Procedural/PVTG Texturizer")]
@@ -29,17 +34,24 @@ namespace PVTG.Editor {
 
             //Show existing window instance. If one doesn't exist, make one.
             instance = (TexturizerEditor)EditorWindow.GetWindow(typeof(TexturizerEditor));
+            
+
         }
 
         void OnGUI()
         {
 
+
            
 
+
+
+           // float width = EditorGUIUtility.currentViewWidth;
 
             if (instance == null)
             {
                 instance = this;
+                instance._graphView = null;
             }
 
             if (instance._previewCamera == null)
@@ -58,19 +70,32 @@ namespace PVTG.Editor {
             //Camera Controls
             bool needsRepaint = MoveCamera();
 
+            Rect screenDims = new Rect(0, 20, EditorGUIUtility.currentViewWidth - 1, Screen.height - Screen.height * 0.2f - 41);
+            if (_graphView == null)
+            {
+                _graphView = new TexturizerGraphView { name = "New Graph" };
+                rootVisualElement.Add(_graphView);
+                _graphView.StretchToParentSize();
 
+                Image image = new Image();
+                image.image = _previewTexture;
+               // rootVisualElement.Add(image);
+               
+               
+                image.BringToFront();
+            }
 
 
             titleContent.text = "PVTG Editor";
 
             float minScale = Mathf.Min(Screen.width, Screen.height);
 
-            if (_previewTexture == null) _previewTexture = new RenderTexture(Screen.width, Screen.height, 1);
+            if (_previewTexture == null) _previewTexture = new RenderTexture((int)(Mathf.RoundToInt(screenDims.width)), Mathf.RoundToInt(screenDims.height), 1);
             if (new Vector2(Screen.width, Screen.height) != _lastScreenDimensions)
             {
                 _previewCamera.targetTexture = null;
                 DestroyImmediate(_previewTexture);
-                _previewTexture = new RenderTexture(Screen.width, Screen.height, 1);
+                _previewTexture = new RenderTexture((int)(Mathf.RoundToInt(screenDims.width)), Mathf.RoundToInt(screenDims.height), 1);
             }
             _lastScreenDimensions = new Vector2(Screen.width, Screen.height);
             _previewCamera.targetTexture = _previewTexture;
@@ -86,7 +111,8 @@ namespace PVTG.Editor {
             EditorGUILayout.ColorField(Color.red);
             EditorGUILayout.EndToggleGroup();*/
 
-            GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), _previewTexture, ScaleMode.StretchToFill);
+            
+            GUI.DrawTexture(new Rect(screenDims.x, screenDims.y, screenDims.width * 0.5f, screenDims.height), _previewTexture, ScaleMode.StretchToFill,false,0,Color.white,0,20.0f);
 
             if (GUI.Button(new Rect(0, 0, minScale * 0.2f, minScale * 0.05f), "Import", EditorStyles.toolbarButton))
             {
@@ -122,6 +148,9 @@ namespace PVTG.Editor {
             if (needsRepaint) {
                 this.Repaint();
             }
+
+
+
         }
 
 
