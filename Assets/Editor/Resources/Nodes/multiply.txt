@@ -1,0 +1,4 @@
+cs_multiply
+I>Texture:Input=Input
+I>Vector:Amount=Amount
+O>Texture:Output=Result
