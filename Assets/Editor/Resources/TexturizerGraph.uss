@@ -1,8 +1,13 @@
 GridBackground {
-	--grid-background-color: #282828;
-	--line-color: rgba(193,196,192,0.1);
-	--thick-line-color: rgba(193,196,192,0.5);
-	margin-top: 20px;
-	
+    --grid-background-color: rgb(40, 40, 40);
+    --line-color: rgba(193, 196, 192, 0.1);
+    --thick-line-color: rgba(193, 196, 192, 0.5);
+    margin-top: 20px;
 }
 
+.menuBox {
+}
+
+.menuButton {
+    width: auto;
+}

@@ -1,0 +1,13 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="UnityEngine.UIElements" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" schemaLocation="UnityEngine.UIElements ../UIElementsSchema/UnityEngine.UIElements.xsd" editor-extension-mode="True">
+    <Style src="TexturizerGraph.uss" />
+    <uie:Toolbar>
+        <uie:ToolbarMenu display-tooltip-when-elided="True" text="Import" style="justify-content: flex-start; align-items: center;" />
+    </uie:Toolbar>
+    <ui:VisualElement name="PreviewWindow" style="position: absolute; width: 267.2px; height: 218px; top: 179px; left: 409px; border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; border-top-left-radius: 5px; border-bottom-left-radius: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px; border-left-color: rgb(25, 25, 25); border-right-color: rgb(25, 25, 25); border-top-color: rgb(25, 25, 25); border-bottom-color: rgb(25, 25, 25); overflow: hidden; min-width: 100px; min-height: 100px; visibility: visible; display: flex; opacity: 1;">
+        <ui:VisualElement name="TopBar" style="height: 26px; position: absolute; width: 100%; background-color: rgb(57, 57, 57); border-bottom-width: 1px; border-bottom-color: rgba(35, 35, 35, 255);">
+            <ui:Label text="Preview" display-tooltip-when-elided="True" name="Title" style="position: absolute; padding-left: 0; padding-right: 0; margin-top: 5px; margin-bottom: 5px; margin-left: 7px;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="PreviewImage" style="margin-top: 0; width: 100%; position: absolute; top: 25px; border-bottom-color: rgba(0, 0, 0, 255); flex-basis: 100%; flex-grow: 1; flex-direction: column; flex-wrap: nowrap; height: auto; bottom: 0;" />
+    </ui:VisualElement>
+    <ui:VisualElement />
+</ui:UXML>

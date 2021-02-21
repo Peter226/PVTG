@@ -48,7 +48,6 @@ namespace PVTG
             List<int> subTriangles = new List<int>();
             for (int i = 0; i < mesh.subMeshCount; i++)
             {
-                Debug.Log("Detected Submesh " + i.ToString());
                 mesh.GetTriangles(triangles,i,false);
 
                 int index = 0;

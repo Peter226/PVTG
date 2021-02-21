@@ -73,54 +73,10 @@ namespace PVTG.Editor {
                 _graphView = new TexturizerGraphView { name = "New Graph" };
                 rootVisualElement.Add(_graphView);
                 _graphView.StretchToParentSize();
-                _previewElement = new TexturePreviewWindow();
-
-
-                VisualElement previewWindow = new VisualElement();
-                previewWindow.style.width = 100;
-                previewWindow.style.height = 100;
-                previewWindow.style.position = Position.Absolute;
-                previewWindow.style.borderTopLeftRadius = 10;
-                previewWindow.style.borderTopRightRadius = 10;
-                previewWindow.style.borderBottomLeftRadius = 10;
-                previewWindow.style.borderBottomRightRadius = 10;
-                previewWindow.style.overflow = Overflow.Hidden;
-                previewWindow.style.borderBottomColor = (Color)new Color32(25,25,25,255);
-                previewWindow.style.borderTopColor = (Color)new Color32(25, 25, 25, 255);
-                previewWindow.style.borderRightColor = (Color)new Color32(25, 25, 25, 255);
-                previewWindow.style.borderLeftColor = (Color)new Color32(25, 25, 25, 255);
-                previewWindow.style.borderLeftWidth = 1.5f;
-                previewWindow.style.borderRightWidth = 1.5f;
-                previewWindow.style.borderTopWidth = 1.5f;
-                previewWindow.style.borderBottomWidth = 1.5f;
-                previewWindow.style.backgroundColor = (Color)new Color32(40,40,40,255);
-                previewWindow.style.minWidth = 120;
-                previewWindow.style.minHeight = 130;
-                //resizer.activateButton = MouseButton.LeftMouse;
-                previewWindow.AddManipulator(new Dragger());
-                rootVisualElement.Add(previewWindow);
-                Label previewLabel = new Label("Preview");
-                previewLabel.style.paddingBottom = 5;
-                previewLabel.style.paddingTop = 5;
-                previewLabel.style.paddingLeft = 7;
-                previewLabel.style.backgroundColor = (Color)new Color32(58, 58, 58, 255);
-                previewWindow.Add(previewLabel);
-                previewLabel.BringToFront();
-                previewWindow.BringToFront();
-
-                ResizableElement resizeableElement = new ResizableElement();
-                previewWindow.Add(resizeableElement);
 
 
 
-
-                //rootVisualElement.Add(_previewElement);
-                previewWindow.Add(_previewElement);
-                _previewElement.style.width = 100;
-                _previewElement.style.height = 100;
-                _previewElement.style.backgroundColor = new StyleColor(new Color(1,1,1,1));
-                _previewElement.BringToFront();
-                _previewElement.StretchToParentSize();
+              
                 Button importer = new Button();
                 importer.text = "Import";
                 rootVisualElement.Add(importer);
@@ -144,13 +100,41 @@ namespace PVTG.Editor {
                 label.style.backgroundColor = (Color)new Color32(88,88,88,255);
                 label.BringToFront();
                 importer.BringToFront();
-                resizeableElement.BringToFront();
-
-                previewLabel.style.position = Position.Relative;
-                _previewElement.style.position = Position.Relative;
 
 
                 //TexturizerNode.patterns
+
+
+                VisualTreeAsset uiAsset = Resources.Load<VisualTreeAsset>("TexturizerGraph");
+                VisualElement ui = uiAsset.CloneTree("");
+
+                foreach (VisualElement ve in ui.Children())
+                {
+                    if (ve.name == "PreviewWindow")
+                    {
+                        ResizableElement resizer = new ResizableElement();
+                        ve.Add(resizer);
+                        resizer.BringToFront();
+                        ve.AddManipulator(new Dragger());
+
+                        foreach (VisualElement sve in ve.Children())
+                        {
+                            if (sve.name == "PreviewImage")
+                            {
+                                _previewElement = new TexturePreviewWindow();
+                                sve.Add(_previewElement);
+                                _previewElement.image = _previewElement.image;
+                                _previewElement.scaleMode = ScaleMode.StretchToFill;
+                                _previewElement.StretchToParentSize();
+                            }
+                        }
+                    }
+                }
+                
+
+
+
+                rootVisualElement.Add(ui);
 
 
             }
@@ -219,7 +203,6 @@ namespace PVTG.Editor {
                 {
                     WorkObject workObject = _workObjects[i];
                     workObject.Render(_previewElement.cameraHolder.camera, 31);
-                    Debug.Log("Drawn");
                 }
 
 
@@ -227,6 +210,7 @@ namespace PVTG.Editor {
 
 
             _previewElement.cameraHolder.camera.Render();
+            rootVisualElement.MarkDirtyRepaint();
         }
 
 
@@ -240,7 +224,6 @@ namespace PVTG.Editor {
                     workObject.Destroy();
                 }
                 _workObjects.Clear();
-                Debug.Log("Collected");
                 GetRenderersCascade(obj.transform, _workObjects);
             }
             DrawWorkObjects();

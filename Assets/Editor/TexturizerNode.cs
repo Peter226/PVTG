@@ -57,7 +57,6 @@ namespace PVTG {
 
         void RemovedNode()
         {
-            Debug.Log("Removed");
             previewTexture.Release();
         }
 
