@@ -33,7 +33,9 @@ namespace PVTG.Editor
             _previewTexture.Create();
             cameraHolder.camera.targetTexture = _previewTexture;
             this.image = _previewTexture;
-            TexturizerEditor.instance.DrawWorkObjects();
+            if (TexturizerEditor.instance != null) {
+                TexturizerEditor.instance.DrawWorkObjects();
+            }
         }
 
 

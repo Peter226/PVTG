@@ -10,7 +10,7 @@ namespace PVTG
         public Mesh mesh;
         private GameObject _previewObject;
         private List<Mesh> _subMeshes = new List<Mesh>();
-
+        private List<GameObject> _colliderObjects = new List<GameObject>();
 
         /// <summary>
         /// Clean up after the preview object
@@ -24,6 +24,12 @@ namespace PVTG
             }
             _subMeshes.Clear();
             materials.Clear();
+            Object.DestroyImmediate(_previewObject);
+            for (int i = 0;i < _colliderObjects.Count;i++)
+            {
+                Object.DestroyImmediate(_colliderObjects[i]);
+            }
+            _colliderObjects.Clear();
         }
 
         /// <summary>
@@ -35,11 +41,12 @@ namespace PVTG
         public WorkObject(Mesh mesh, MeshRenderer renderer, Transform parent = null)
         {
             _previewObject = new GameObject();
+            _previewObject.hideFlags = HideFlags.HideAndDontSave;
             _previewObject.transform.position = renderer.transform.position;
             _previewObject.transform.rotation = renderer.transform.rotation;
             _previewObject.transform.localScale = renderer.transform.localScale;
             _previewObject.transform.parent = parent;
-
+            _previewObject.layer = 31;
             List<int> triangles = new List<int>();
             Dictionary<int, int> triangleDict = new Dictionary<int, int>();
             List<Vector3> vertices = new List<Vector3>();
@@ -71,10 +78,15 @@ namespace PVTG
                 subMesh.SetVertices(subVertices);
                 subMesh.SetTriangles(subTriangles,0);
                 subMesh.RecalculateBounds();
-                GameObject test = new GameObject();
-                test.AddComponent<MeshCollider>();
-                test.GetComponent<MeshCollider>().sharedMesh = subMesh;
-
+                GameObject colliderObject = new GameObject();
+                colliderObject.hideFlags = HideFlags.HideAndDontSave;
+                colliderObject.transform.position = _previewObject.transform.position;
+                colliderObject.transform.rotation = _previewObject.transform.rotation;
+                colliderObject.transform.localScale = _previewObject.transform.localScale;
+                MeshCollider meshCollider = colliderObject.AddComponent<MeshCollider>();
+                colliderObject.layer = 31;
+                meshCollider.sharedMesh = subMesh;
+                _colliderObjects.Add(colliderObject);
 
                 _subMeshes.Add(subMesh);
                 triangleDict.Clear();

@@ -28,19 +28,25 @@ namespace PVTG
 
 
 
-
-
-
             TexturizerNode node = new TexturizerNode(TexturizerNode.patterns["cs_multiply"]);
             node.SetPosition(new Rect(10, 10, 500, 500));
             AddElement(node);
 
             TexturizerNode node2 = new TexturizerNode(TexturizerNode.patterns["cs_multiply"]);
-            node2.SetPosition(new Rect(10, 500, 500, 500));
+            node2.SetPosition(new Rect(10, 30, 500, 500));
             AddElement(node2);
 
+            TexturizerNode node3 = new TexturizerNode(TexturizerNode.patterns["cs_multiply"]);
+            node3.SetPosition(new Rect(10, 60, 500, 500));
+            AddElement(node3);
 
+            TexturizerNode node4 = new TexturizerNode(TexturizerNode.patterns["cs_multiply"]);
+            node4.SetPosition(new Rect(10, 60, 500, 500));
+            AddElement(node4);
 
+            TexturizerNode node5 = new TexturizerNode(TexturizerNode.patterns["cs_multiply"]);
+            node5.SetPosition(new Rect(10, 80, 500, 500));
+            AddElement(node5);
         }
 
 
@@ -50,13 +56,11 @@ namespace PVTG
             ports.ForEach( port => {
                 if (port.node != startPort.node && port.portType == startPort.portType && port.direction != startPort.direction)
                 {
-                    compatiblePorts.Add(port);
+                    bool recursion = false;
+                    ((TexturizerNode)port.node).HuntRecursion(startPort.node, ref recursion, startPort.direction);
+                    if (!recursion) compatiblePorts.Add(port);
                 }
             });
-
-            
-
-
             return compatiblePorts;
         }
 

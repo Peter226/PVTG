@@ -6,7 +6,7 @@ using UnityEngine.UIElements;
 using UnityEditor;
 
 namespace PVTG {
-    public class TexturizerNode : Node
+    public class TexturizerNode : Node, IEdgeConnectorListener
     {
         public static Dictionary<string,ComputePattern> patterns = new Dictionary<string,ComputePattern>();
         private ComputePattern _pattern;
@@ -43,6 +43,7 @@ namespace PVTG {
                     container = outputContainer;
                 }
                 Port p = InstantiatePort(Orientation.Horizontal, direction, capacity, computeProperty.type);
+                p.AddManipulator(new EdgeConnector<Edge>(this));
                 p.portName = computeProperty.name;
                 container.Add(p);
                 ports.Add(p);
@@ -60,6 +61,68 @@ namespace PVTG {
             previewTexture.Release();
         }
 
+        public void AlertChange()
+        {
+            Debug.Log("AlertChange");
+            foreach (Port port in ports)
+            {
+                if (port.direction == Direction.Output)
+                {
+                    foreach (Edge edge in port.connections)
+                    {
+                        if (edge.output.direction == Direction.Input)
+                            ((TexturizerNode)edge.output.node).AlertChange();
+                        if (edge.input.direction == Direction.Input)
+                            ((TexturizerNode)edge.input.node).AlertChange();
+                    }
+                }
+            }
+        }
+            
+        public void HuntRecursion(Node origin, ref bool found, Direction direction)
+        {
+            if (this != origin)
+            {
+                foreach (Port port in ports)
+                {
+                    if (port.direction == direction)
+                    {
+                        foreach (Edge edge in port.connections)
+                        {
+                            if (edge.input.direction != direction)
+                            {
+                                ((TexturizerNode)edge.input.node).HuntRecursion(origin, ref found, direction);
+                            }
+                            if (edge.output.direction != direction)
+                            {
+                                ((TexturizerNode)edge.output.node).HuntRecursion(origin, ref found, direction);
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                found = true;
+            }
+        }
 
+
+        public void OnDropOutsidePort(Edge edge, Vector2 position)
+        {
+            Debug.Log("Dropped Outside");
+        }
+
+        public void OnDrop(GraphView graphView, Edge edge)
+        {
+            if (edge.input.direction == Direction.Input)
+            {
+                ((TexturizerNode)edge.input.node).AlertChange();
+            }
+            if (edge.output.direction == Direction.Input)
+            {
+                ((TexturizerNode)edge.output.node).AlertChange();
+            }
+        }
     }
 }

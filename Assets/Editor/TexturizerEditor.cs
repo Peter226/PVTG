@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Collections;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
-
+using UnityEditor.UIElements;
 namespace PVTG.Editor {
     public class TexturizerEditor : EditorWindow
     {
@@ -27,7 +27,7 @@ namespace PVTG.Editor {
         private Camera _previewCam;
 
         // Add menu item named "My Window" to the Window menu
-        [MenuItem("Procedural/PVTG Texturizer")]
+        [MenuItem("Procedural/PVTG Editor")]
         public static void ShowWindow()
         {
             
@@ -37,23 +37,19 @@ namespace PVTG.Editor {
 
         }
 
-        private void OnEnable()
+
+        private void OnDisable()
         {
+            foreach (WorkObject workObject in _workObjects)
+            {
+                workObject.Destroy();
+            }
+            _workObjects.Clear();
 
         }
 
-
-
-
-        private void OnGUI()
+        private void OnEnable()
         {
-
-
-           
-
-
-
-           // float width = EditorGUIUtility.currentViewWidth;
 
             if (instance == null)
             {
@@ -61,10 +57,8 @@ namespace PVTG.Editor {
                 instance._graphView = null;
             }
 
-          
+            titleContent.text = "PVTG Editor";
 
-
-            Rect screenDims = new Rect(0, 20, EditorGUIUtility.currentViewWidth - 1, Screen.height - Screen.height * 0.2f - 41);
 
             if (_graphView == null)
             {
@@ -73,37 +67,6 @@ namespace PVTG.Editor {
                 _graphView = new TexturizerGraphView { name = "New Graph" };
                 rootVisualElement.Add(_graphView);
                 _graphView.StretchToParentSize();
-
-
-
-              
-                Button importer = new Button();
-                importer.text = "Import";
-                rootVisualElement.Add(importer);
-                importer.style.marginTop = 0;
-                importer.style.marginLeft = 0;
-                importer.style.height = 20;
-                importer.style.width = 100;
-                importer.clicked += OnImport;
-                importer.style.borderBottomLeftRadius = 0;
-                importer.style.borderBottomRightRadius = 0;
-                importer.style.borderTopLeftRadius = 0;
-                importer.style.borderTopRightRadius = 0;
-                Label label = new Label();
-                rootVisualElement.Add(label);
-                label.StretchToParentWidth();
-                label.style.height = 20;
-                label.style.marginLeft = 0;
-                label.style.marginTop = 0;
-                label.style.position = Position.Absolute;
-                label.style.unityTextAlign = TextAnchor.MiddleCenter;
-                label.style.backgroundColor = (Color)new Color32(88,88,88,255);
-                label.BringToFront();
-                importer.BringToFront();
-
-
-                //TexturizerNode.patterns
-
 
                 VisualTreeAsset uiAsset = Resources.Load<VisualTreeAsset>("TexturizerGraph");
                 VisualElement ui = uiAsset.CloneTree("");
@@ -130,68 +93,22 @@ namespace PVTG.Editor {
                         }
                     }
                 }
-                
+
 
 
 
                 rootVisualElement.Add(ui);
-
+                int idk = 0;
+                Toolbar ToolBar = new Toolbar();
+                rootVisualElement.Add(ToolBar);
+                ToolbarMenu ToolBarMenu = new ToolbarMenu();
+                ToolBarMenu.text = "Import";
+                ToolBarMenu.menu.AppendAction("From Selection", a => { idk++; OnImport(); }, a => DropdownMenuAction.Status.Normal);
+                ToolBar.Add(ToolBarMenu);
 
             }
-            
-
-            titleContent.text = "PVTG Editor";
-
-            float minScale = Mathf.Min(Screen.width, Screen.height);
-
-
         }
 
-
-        /*  bool MoveCamera()
-          {
-              bool changed = false;
-
-              if (Event.current.type == EventType.ScrollWheel)
-              {
-                  _previewCamera.transform.position = _cameraPivot + (_previewCamera.transform.position - _cameraPivot) * (1 + Event.current.delta.y * 0.01f * Mathf.Log(Vector3.Distance(_cameraPivot, _previewCamera.transform.position)));
-                  changed = true;
-              }
-
-
-              if (Event.current.type == EventType.MouseDown)
-              {
-                  _mouseDelta = Vector2.zero;
-                  _lastMouse = Event.current.mousePosition;
-              }
-
-              if (Event.current.type == EventType.MouseDrag)
-              {
-                  if (Event.current.button == 2)
-                  {
-                      if (Event.current.shift)
-                      {
-                          _mouseDelta = _lastMouse - Event.current.mousePosition;
-                          _lastMouse = Event.current.mousePosition;
-                          Vector3 move = _previewCamera.transform.right * _mouseDelta.x * 0.01f + _previewCamera.transform.up * _mouseDelta.y * -0.01f;
-                          _cameraPivot += move;
-                          _previewCamera.transform.position += move;
-                      }
-                      else
-                      {
-                          _mouseDelta = _lastMouse - Event.current.mousePosition;
-                          _lastMouse = Event.current.mousePosition;
-                          _previewCamera.transform.RotateAround(_cameraPivot,Vector3.up,-_mouseDelta.x * 0.5f);
-                          _previewCamera.transform.RotateAround(_cameraPivot, _previewCamera.transform.right, -_mouseDelta.y * 0.5f);
-                      }
-
-                      changed = true;
-                  }
-              }
-              return changed;
-          }
-
-     */
 
 
 
