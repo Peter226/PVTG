@@ -5,6 +5,7 @@ using System.Collections;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
 using UnityEditor.UIElements;
+using UnityEngine.SceneManagement;
 namespace PVTG.Editor {
     public class TexturizerEditor : EditorWindow
     {
@@ -17,14 +18,13 @@ namespace PVTG.Editor {
         float myFloat = 1.23f;*/
 
         private List<WorkObject> _workObjects = new List<WorkObject>();
-       
+        Dictionary<int, WorkObject> _selectables = new Dictionary<int, WorkObject>();
         private TexturePreviewWindow _previewElement;
-        private Vector2 _lastScreenDimensions;
-
-        private Vector2 _lastMouse;
-        private Vector2 _mouseDelta;
         private TexturizerGraphView _graphView;
-        private Camera _previewCam;
+        private WorkObject _selectedObject;
+
+
+
 
         // Add menu item named "My Window" to the Window menu
         [MenuItem("Procedural/PVTG Editor")]
@@ -37,6 +37,14 @@ namespace PVTG.Editor {
 
         }
 
+        public void ToggleSelectorColliders(bool active)
+        {
+            foreach (WorkObject workObject in _workObjects)
+            {
+                workObject.ToggleCollision(active);
+            }   
+        }
+
 
         private void OnDisable()
         {
@@ -47,6 +55,29 @@ namespace PVTG.Editor {
             _workObjects.Clear();
 
         }
+
+
+        public void SelectWorkObject(int colliderID)
+        {
+            if (_selectables.ContainsKey(colliderID))
+            {
+                if (_selectedObject != null && _selectedObject.colliderIDs.Contains(colliderID))
+                {
+                    _selectedObject = null;
+                }
+                else
+                {
+                    _selectedObject = _selectables[colliderID];
+                }
+            }
+            else
+            {
+                DeselectWorkObject();
+            }
+        }
+        public void DeselectWorkObject() {
+            _selectedObject = null;
+         }
 
         private void OnEnable()
         {
@@ -112,38 +143,58 @@ namespace PVTG.Editor {
 
 
 
-        public void DrawWorkObjects()
+        public void DrawWorkObjects(Camera camera)
         {
-            if (_previewElement.cameraHolder.camera != null)
+            if (camera != null)
             {
                 for (int i = 0; i < _workObjects.Count; i++)
                 {
                     WorkObject workObject = _workObjects[i];
-                    workObject.Render(_previewElement.cameraHolder.camera, 31);
+                    workObject.Render(camera, 31);
                 }
-
-
             }
-
-
-            _previewElement.cameraHolder.camera.Render();
-            rootVisualElement.MarkDirtyRepaint();
+            camera.Render();
+        }
+        public bool DrawSelectedObject(Camera camera)
+        {
+            if (camera != null)
+            {
+                if (_selectedObject != null)
+                {
+                    _selectedObject.Render(camera, 31);
+                    camera.Render();
+                    return true;
+                }
+            }
+            return false;
         }
 
 
         void OnImport()
         {
+            
             if (Selection.activeGameObject != null)
             {
-                GameObject obj = Selection.activeGameObject;
+
                 foreach (WorkObject workObject in _workObjects)
                 {
                     workObject.Destroy();
                 }
                 _workObjects.Clear();
-                GetRenderersCascade(obj.transform, _workObjects);
+                _selectables.Clear();
+                foreach (GameObject selectedObject in Selection.gameObjects)
+                {
+                    GetRenderersCascade(selectedObject.transform, _workObjects);
+                }
+                foreach (WorkObject workObject in _workObjects)
+                {
+                    foreach (int id in workObject.colliderIDs)
+                    {
+                        _selectables.Add(id, workObject);
+                    }
+                }
             }
-            DrawWorkObjects();
+            _previewElement.ReDraw();
         }
 
 

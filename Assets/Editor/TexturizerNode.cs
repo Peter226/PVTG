@@ -79,7 +79,7 @@ namespace PVTG {
             }
         }
             
-        public void HuntRecursion(Node origin, ref bool found, Direction direction)
+        public void FindRecursion(Node origin, ref bool found, Direction direction)
         {
             if (this != origin)
             {
@@ -91,11 +91,11 @@ namespace PVTG {
                         {
                             if (edge.input.direction != direction)
                             {
-                                ((TexturizerNode)edge.input.node).HuntRecursion(origin, ref found, direction);
+                                ((TexturizerNode)edge.input.node).FindRecursion(origin, ref found, direction);
                             }
                             if (edge.output.direction != direction)
                             {
-                                ((TexturizerNode)edge.output.node).HuntRecursion(origin, ref found, direction);
+                                ((TexturizerNode)edge.output.node).FindRecursion(origin, ref found, direction);
                             }
                         }
                     }

@@ -13,19 +13,16 @@ namespace PVTG
         {
             styleSheets.Add(Resources.Load<StyleSheet>("TexturizerGraph"));
 
+            //Add Controls
             SetupZoom(ContentZoomer.DefaultMinScale * 0.03f, ContentZoomer.DefaultMaxScale * 10.0f);
-
             this.AddManipulator(new ContentDragger());
             this.AddManipulator(new SelectionDragger());
             this.AddManipulator(new RectangleSelector());
 
-            
-
+            //Add background grid
             var grid = new GridBackground();
-            
             Insert(0, grid);
             grid.StretchToParentSize();
-
 
 
             TexturizerNode node = new TexturizerNode(TexturizerNode.patterns["cs_multiply"]);
@@ -57,7 +54,7 @@ namespace PVTG
                 if (port.node != startPort.node && port.portType == startPort.portType && port.direction != startPort.direction)
                 {
                     bool recursion = false;
-                    ((TexturizerNode)port.node).HuntRecursion(startPort.node, ref recursion, startPort.direction);
+                    ((TexturizerNode)port.node).FindRecursion(startPort.node, ref recursion, startPort.direction);
                     if (!recursion) compatiblePorts.Add(port);
                 }
             });

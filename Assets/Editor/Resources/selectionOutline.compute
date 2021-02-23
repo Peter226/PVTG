@@ -1,0 +1,17 @@
+#pragma kernel CSMain
+Texture2D<float4> Input;
+float4 Amount;
+RWTexture2D<float4> Result;
+[numthreads(8, 8, 1)]
+void CSMain(uint3 id : SV_DispatchThreadID)
+{
+	float4 i = Input[id.xy];
+	if (i.a > 0.0) {
+		i = float4(1, 1, 1, 1);
+	}
+	else {
+		i = float4(0, 0, 0, 0);
+	}
+	Result[id.xy] = i;
+}
+

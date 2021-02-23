@@ -1,0 +1,13 @@
+#pragma kernel CSMain
+Texture2D<float4> Input;
+Texture2D<float4> Solid;
+Texture2D<float4> Albedo;
+float4 Amount;
+RWTexture2D<float4> Result;
+[numthreads(8, 8, 1)]
+void CSMain(uint3 id : SV_DispatchThreadID)
+{
+	float4 i = Albedo[id.xy] + Input[id.xy].a * 0.01 * (1 - Solid[id.xy].a) * float4(0.01,0.1,0.2,0);
+	Result[id.xy] = i;
+}
+

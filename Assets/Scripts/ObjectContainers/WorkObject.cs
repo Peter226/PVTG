@@ -11,10 +11,22 @@ namespace PVTG
         private GameObject _previewObject;
         private List<Mesh> _subMeshes = new List<Mesh>();
         private List<GameObject> _colliderObjects = new List<GameObject>();
+        public List<int> colliderIDs { get; }
+
+
+
+        public void ToggleCollision(bool active)
+        {
+            foreach (GameObject gameObject in _colliderObjects)
+            {
+                gameObject.SetActive(active);
+            }
+        }
 
         /// <summary>
         /// Clean up after the preview object
         /// </summary>
+        /// 
         public void Destroy()
         {
             Object.DestroyImmediate(_previewObject);
@@ -53,6 +65,7 @@ namespace PVTG
             mesh.GetVertices(vertices);
             List<Vector3> subVertices = new List<Vector3>();
             List<int> subTriangles = new List<int>();
+            colliderIDs = new List<int>();
             for (int i = 0; i < mesh.subMeshCount; i++)
             {
                 mesh.GetTriangles(triangles,i,false);
@@ -84,10 +97,11 @@ namespace PVTG
                 colliderObject.transform.rotation = _previewObject.transform.rotation;
                 colliderObject.transform.localScale = _previewObject.transform.localScale;
                 MeshCollider meshCollider = colliderObject.AddComponent<MeshCollider>();
+                colliderIDs.Add(colliderObject.GetInstanceID());
                 colliderObject.layer = 31;
                 meshCollider.sharedMesh = subMesh;
                 _colliderObjects.Add(colliderObject);
-
+                colliderObject.SetActive(false);
                 _subMeshes.Add(subMesh);
                 triangleDict.Clear();
                 subVertices.Clear();
@@ -99,6 +113,16 @@ namespace PVTG
 
             this.mesh = mesh;
             renderer.GetSharedMaterials(materials);
+            foreach (Material material in materials)
+            {
+
+                int propCount = material.shader.GetPropertyCount();
+                for (int i = 0;i < propCount;i++)
+                {
+                    Debug.Log(material.shader.GetPropertyName(i));
+                    Debug.Log(material.shader.GetPropertyType(i));
+                }
+            }
         }
 
         /// <summary>
@@ -108,10 +132,12 @@ namespace PVTG
         /// <param name="layer"></param>
         public void Render(Camera camera, int layer)
         {
-            Matrix4x4 matrix = Matrix4x4.TRS(_previewObject.transform.position,_previewObject.transform.rotation,_previewObject.transform.lossyScale);
-            for (int i = 0;i < materials.Count;i++)
-            {
-                Graphics.DrawMesh(mesh, matrix, materials[i], layer, camera,i % mesh.subMeshCount);
+            if (_previewObject != null) {
+                Matrix4x4 matrix = Matrix4x4.TRS(_previewObject.transform.position, _previewObject.transform.rotation, _previewObject.transform.lossyScale);
+                for (int i = 0; i < materials.Count; i++)
+                {
+                    Graphics.DrawMesh(mesh, matrix, materials[i], layer, camera, i % mesh.subMeshCount);
+                }
             }
         }
 
